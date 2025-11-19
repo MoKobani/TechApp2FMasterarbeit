@@ -1,0 +1,45 @@
+﻿<Window x:Class="PL.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PL"
+        xmlns:customcontrol="clr-namespace:PL.CustomControl"
+        mc:Ignorable="d"
+        Title="TechnikApp 2F-Leuchten" Height="650" Width="1200">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="26"/>
+        </Grid.RowDefinitions>
+
+        
+
+        <!--Our side menu custom control-->
+        <!--here-->
+        <customcontrol:MenuWithSubMenuControl Grid.Column="0"  Grid.Row="0" Grid.RowSpan="2" HasIcon="True" SubMenuPadding="15,0,0,0"/>
+        <Image Source="/Resources/Images/Logo-2F.png" Margin="0,272,0,-246" Grid.RowSpan="2"/>
+
+
+
+        <!--and frame for pages to navigate when a menu is selected-->
+        <Frame x:Name="MainWindowFrame" Grid.Column="1" Grid.Row="0" NavigationUIVisibility="Hidden"/>
+        <!--<Image Source="/Resources/Images/Logo-2F.png" Grid.Column = "1" Margin="0,228,0,227" IsEnabled="False" />-->
+        
+
+
+        <!--Statusbar-->
+        <StatusBar Grid.Column="1" Grid.Row="1">
+            <StatusBarItem Margin="5,0,0,0">
+                <TextBlock  Text="{Binding}" Foreground="Green" x:Name ="txbStatus" />
+                
+            </StatusBarItem>
+
+        </StatusBar>
+    </Grid>
+</Window>

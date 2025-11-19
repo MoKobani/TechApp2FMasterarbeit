@@ -1,0 +1,326 @@
+﻿<Page x:Class="PL.Pages.AssemblyConnection"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:PL.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="1000"
+      Title="AssemblyConncetion">
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <!-- Style für runde Buttons -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#FF1B1F1F"/>
+            <!-- Normal -->
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property = "Height" Value="25"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                        CornerRadius="5"
+                        SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Hover-Effekt -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF2D2C2C"/>
+                                <!-- Hover-Farbe -->
+                            </Trigger>
+
+                            <!-- Klick-Effekt -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FF2D2C2C"/>
+                                <!-- Klick-Farbe -->
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style für runde TextBox -->
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#CCC"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border CornerRadius="5"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Minimaler Style: NUR abgerundete Ecken für ComboBox -->
+        <Style TargetType="ComboBox">
+            <!-- Grundwerte wie bei deiner TextBox -->
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="BorderBrush" Value="#CCC"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <!-- Äußerer Rahmen mit runden Ecken -->
+                        <Grid>
+                            <Border x:Name="Border"
+                            CornerRadius="5"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"/>
+
+                            <!-- Inhalt + Dropdown-Button -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Nicht editierbar: zeigt Auswahltext -->
+                                <ContentPresenter x:Name="ContentSite"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"/>
+
+                                <!-- Editierbar: eingebaute TextBox -->
+                                <TextBox x:Name="PART_EditableTextBox"
+                                 Margin="{TemplateBinding Padding}"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 VerticalAlignment="Center"
+                                 Visibility="Hidden"/>
+
+                                <!-- Rechter Button zum Öffnen (schlicht, ohne Extra-Optik) -->
+                                <ToggleButton x:Name="ToggleButton"
+                                      Grid.Column="1"
+                                      Focusable="False"
+                                      IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      Padding="8,0">
+                                    <!-- Einfache Pfeil-Geometrie -->
+                                    <Path Data="M 0 0 L 8 0 L 4 4 Z"
+                                  Width="10"
+                                  Height="6"
+                                  Stretch="Uniform"
+                                  Fill="#666"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"/>
+                                </ToggleButton>
+                            </Grid>
+
+                            <!-- Popup mit Standard-ItemsPresenter, ebenfalls abgerundet -->
+                            <Popup x:Name="PART_Popup"
+                           Placement="Bottom"
+                           AllowsTransparency="True"
+                           Focusable="False"
+                           IsOpen="{TemplateBinding IsDropDownOpen}"
+                           PopupAnimation="Fade">
+                                <Border CornerRadius="5"
+                                Margin="0,4,0,0"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                                    <ScrollViewer CanContentScroll="True"
+                                          VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+
+                        <!-- Minimale Trigger nur für Editierbarkeit (keine Farben/Animationen) -->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEditable" Value="True">
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Page.Resources>
+
+
+
+    <Grid>
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="52"/>
+                <RowDefinition Height="85*"/>
+                <RowDefinition Height="54*"/>
+                <RowDefinition Height="277*"/>
+                <RowDefinition Height="52"/>
+            </Grid.RowDefinitions>
+
+            <!-- Artikelnummer -->
+            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="5,5,5,5">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock Text="Artikelnummer" />
+                    <TextBox  Text="{Binding Path= Articlenumber, Mode=TwoWay}" Width="200" Height="30" HorizontalAlignment="Left" />
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="25,0,5,0">
+                    <TextBlock  Text="Baugruppe"/>
+                    <ComboBox x:Name="cbxAsmType" Text="{Binding Parttype, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="150" Height="30" IsEditable="True"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="10,0,5,0">
+                    <TextBlock  Text="Oberfläche"/>
+                    <ComboBox x:Name="cbxSurface" Text="{Binding Surface, Mode=TwoWay}" Width="Auto" Height="30" IsEditable="True"/>
+                </StackPanel>
+
+            </StackPanel>
+
+
+            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="5,5,5,5">
+                <!-- Maße: Länge, Breite, Höhe -->
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                        <TextBlock Text="Länge: mm" HorizontalAlignment="Center"/>
+                        <TextBox  Text="{Binding Length, Mode = TwoWay}" Width="80"/>
+                    </StackPanel>
+                    <StackPanel Margin="10,0,0,0">
+                        <TextBlock Text="Breite: mm" HorizontalAlignment="Center"/>
+                        <TextBox  Text="{Binding Width, Mode = TwoWay}" Width="80"/>
+                    </StackPanel>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Top" >
+                        <TextBlock Text="Höhe: mm" HorizontalAlignment="Center"/>
+                        <TextBox  Text="{Binding Height, Mode = TwoWay}" Width="80"/>
+                    </StackPanel>
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Top" >
+                        <TextBlock Text="Gewicht: kg" HorizontalAlignment="Center"/>
+                        <TextBox  Text= "{Binding Mass, Mode=TwoWay}" Width="80"/>
+                    </StackPanel>
+                </StackPanel>
+                <!-- Optionen -->
+                <StackPanel Margin="5,0,0,0" Orientation="Horizontal" HorizontalAlignment="Right" />
+            </StackPanel>
+
+            <!-- Beschreibung -->
+            <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="0" Margin="5,5,5,5" Grid.RowSpan="2">
+                <TextBlock Text="Beschreibung" />
+                <TextBox x:Name="txtDiscription" AcceptsReturn="True" 
+                 Height="50" TextWrapping="Wrap"
+                 Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Orientation="Vertical" Width="150" HorizontalAlignment="Left"  Margin="0,5,0,0">
+                <TextBlock Text="Beschaffungsart" HorizontalAlignment="Left"/>
+                <ComboBox Text="{Binding ProcurementType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBoxItem Content="Fremdbeschaffung"/>
+                    <ComboBoxItem Content="Eigenfertigung" IsSelected ="True"/>
+                </ComboBox>
+            </StackPanel>
+
+
+            <!-- Stückliste -->
+
+
+
+            <StackPanel Orientation="Vertical" Grid.Row="4" Grid.Column="0" Margin="5,5,5,5" Grid.RowSpan="2">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <!-- Standardmäßig ausblenden -->
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <!-- Sichtbar, wenn Eigenfertigung ausgewählt -->
+                            <DataTrigger Binding="{Binding ProcurementType, UpdateSourceTrigger=PropertyChanged}"
+                 Value="Eigenfertigung">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <TextBlock Text="Stückliste" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="4" Grid.RowSpan="2" HorizontalScrollBarVisibility="Auto" Height="Auto">
+                    <DataGrid x:Name="dgBom" AutoGenerateColumns="True" Height="Auto" VerticalAlignment="Top"/>
+                </ScrollViewer>
+                <Button x:Name="btnLoadBom" Content="Generieren" Width="80" HorizontalAlignment="Left" Margin="0,5,5,5" Click="BtnLoadBom_Click" />
+
+
+            </StackPanel>
+
+
+            <!-- Image Bereich -->
+            <Grid Grid.Row="0" Grid.RowSpan="4" Grid.Column="1" Margin="5,5,5,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Bild passt sich an -->
+                <Border BorderBrush="Black" BorderThickness="1" Grid.Row="0">
+                    <Image x:Name="imgArtikel" Source="{Binding ImagePath, Mode = OneWay}"
+                   Stretch="Uniform"/>
+                </Border>
+                <TextBlock Text="Vorschau" HorizontalAlignment="Center" Grid.Row="1" Margin="5"/>
+            </Grid>
+
+            <StackPanel Grid.Column="1" Grid.Row="4" >
+                <StackPanel  Margin="5">
+                    <TextBlock Text="Dateipfad"/>
+                    <TextBox x:Name="txtPath" Text="{Binding JpgFilePath, Mode = OneWay}" Width="400" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel  Orientation="Horizontal" Margin="5">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="Lagerplatz"/>
+                        <TextBox Text="{Binding StorageLocation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="100" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel Margin="10,0,0,0">
+                        <TextBlock Text="Lagereinheit"/>
+                        <ComboBox Text="{Binding StorageUnit, Mode=TwoWay}" Width="100" HorizontalAlignment="Left">
+                            <ComboBoxItem Content="Stück" IsSelected ="True"/>
+                            <ComboBoxItem Content="Meter"/>
+                            <ComboBoxItem Content="Kilogramm"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Margin="10,0,5,0">
+                        <TextBlock  Text="Weiterverarbeitung"/>
+                        <ComboBox x:Name="cbxProcess" Width="Auto" IsEditable="True" />
+                    </StackPanel>
+
+                </StackPanel>
+
+
+            </StackPanel>
+
+            <!-- Buttons unten rechts -->
+            <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="330,5,0,5" Width="90">
+                <Button x:Name="btnLoad" Content="Laden" Width="80" Margin="5" Click="btnLoad_Click"/>
+            </StackPanel>
+            <StackPanel Grid.Row="5" Grid.Column="1" HorizontalAlignment="Left" Margin="5,5,0,5" Width="90">
+                <Button x:Name="btnSend" Content="Anlegen" Width="80" Click="btnSend_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
