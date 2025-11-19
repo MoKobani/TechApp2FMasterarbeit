@@ -50,4 +50,3 @@ xUnit (Unit testing framework)
 
 FluentAssertions (Improves test readability and diagnostics)
 
-Repository Structure
